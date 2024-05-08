@@ -4,9 +4,15 @@
 #include <iostream>
 #include "Schedule.h"
 
+// Function to calculate hash index for a given key
+size_t calculateHashIndex(const std::string& key) {
+    return key.length();
+}
+
 int main()
 {
-    Schedule schedule;
+    size_t tableSize = 20;
+    Schedule schedule(tableSize);
     ifstream file("STEM - Summer 2022 Schedule of Classes as of 05-02-22(1).csv");
 
     if (file.is_open()) 
@@ -30,7 +36,8 @@ int main()
         cout << "2. Find records by subject" << endl;
         cout << "3. Find records by subject and catalog" << endl;
         cout << "4. Find records by instructor" << endl;
-        cout << "5. Exit" << endl;
+        cout << "5. Display table statistics" << endl;
+        cout << "6. Exit" << endl;
         cout << "Enter your choice: ";
         cin >> choice;
 
@@ -57,12 +64,14 @@ int main()
             schedule.findInstructor(instructor);
             break;
         case 5:
+            schedule.statistics();
+        case 6:
             cout << "Exiting program." << endl;
             break;
         default:
             cout << "Invalid choice. Please enter a number between 1 and 5." << endl;
         }
-    } while (choice != 5);
+    } while (choice != 6);
 
     return 0;
 }

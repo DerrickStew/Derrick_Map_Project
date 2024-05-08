@@ -7,11 +7,14 @@
 #include <utility>
 #include <sstream>
 #include "ScheduleItem.h"
+#include "HashTable.h"
 
 class Schedule 
 {
 private:
-    map<string, ScheduleItem> scheduleMap;
+    HashTable<string, ScheduleItem> scheduleMap; // Instance variable changed to HashTable
+    function<size_t(const string& )> hashFunction; // Stores user-defined hash function
+
 
     // Precondition: None
    // Postcondition: Prints column headers
@@ -21,6 +24,9 @@ private:
     }
 
 public:
+    // Constructor with table size argument
+        Schedule(size_t tableSize) : scheduleMap(tableSize) {}
+
     // Precondition: File is open and in correct format (CSV) with column headers
     // Postcondition: Initializes scheduleMap with data from the file
     void initSchedule(ifstream& file) {
@@ -56,26 +62,26 @@ public:
     // Postcondition: Adds the given ScheduleItem to scheduleMap with a unique key
     void addEntry(const ScheduleItem& item) {
         string key = item.getSubject() + "_" + item.getCatalog() + "_" + item.getSection();
-        scheduleMap[key] = item;
+        scheduleMap.insert(key, item);
     }
 
     // Precondition: None
     // Postcondition: Prints column headers followed by all ScheduleItem objects in scheduleMap
     void print() const {
         printHeader();
-        for (const auto& entry : scheduleMap) {
-            entry.second.print();
+        for (auto it = scheduleMap.begin(); it != scheduleMap.end(); ++it) {
+            it->second.print();
         }
+
     }
 
     // Precondition: None
     // Postcondition: Prints column headers followed by ScheduleItem objects with matching subject
     void findSubject(const string& targetSubject) const {
         printHeader();
-        for (const auto& entry : scheduleMap) {
-            if (entry.second.getSubject() == targetSubject) {
-                entry.second.print();
-            }
+        for (auto it = scheduleMap.begin(); it != scheduleMap.end(); ++it) {
+            if (it->second.getSubject() == targetSubject)
+                it->second.print();
         }
     }
 
@@ -83,10 +89,9 @@ public:
     // Postcondition: Prints column headers followed by ScheduleItem objects with matching subject and catalog
     void findSubjectCatalog(const string& targetSubject, const string& targetCatalog) const {
         printHeader();
-        for (const auto& entry : scheduleMap) {
-            if (entry.second.getSubject() == targetSubject && entry.second.getCatalog() == targetCatalog) {
-                entry.second.print();
-            }
+        for (auto it = scheduleMap.begin(); it != scheduleMap.end(); ++it) {
+            if (it->second.getSubject() == targetSubject && it->second.getCatalog() == targetCatalog)
+                it->second.print();
         }
     }
 
@@ -94,10 +99,29 @@ public:
     // Postcondition: Prints column headers followed by ScheduleItem objects with matching instructor
     void findInstructor(const string& targetInstructor) const {
         printHeader();
-        for (const auto& entry : scheduleMap) {
-            if (entry.second.getInstructor() == targetInstructor) {
-                entry.second.print();
-            }
+        for (auto it = scheduleMap.begin(); it != scheduleMap.end(); ++it) {
+            if (it->second.getInstructor() == targetInstructor)
+                it->second.print();
         }
+    }
+
+    // Precondition – Receives a pointer to a user-defined hash function
+    // Postcondition – Sets the hash function in HashTable.h to the user-defined function
+    void setHashFunction(std::function<size_t(const std::string&)> hashFunc) {
+        scheduleMap.setHashFunction(hashFunc);
+    }
+
+    // Postcondition – Displays the size of the hash table,
+    // the number of buckets in the hash table
+    // the load factor of the hash table,
+    // the number of collisions,
+    // and the length of the longest chain
+    void statistics() {
+        std::cout << "Hash Table Statistics:\n";
+        std::cout << "Size of the hash table: " << scheduleMap.getSize() << std::endl;
+        std::cout << "Number of buckets in the hash table: " << scheduleMap.getBuckets() << std::endl;
+        std::cout << "Load factor of the hash table: " << scheduleMap.getLoadFactor() << std::endl;
+        std::cout << "Number of collisions: " << scheduleMap.countCollisions() << std::endl;
+        std::cout << "Length of the longest chain: " << scheduleMap.maxBucketSize() << std::endl;
     }
 };

@@ -130,6 +130,7 @@
     <ClCompile Include="Derrick_Map_Project.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="HashTable.h" />
     <ClInclude Include="Schedule.h" />
     <ClInclude Include="ScheduleItem.h" />
   </ItemGroup>
